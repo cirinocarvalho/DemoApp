@@ -1,0 +1,4 @@
+.vs/
+src/DemoApp.Core/obj/
+src/DemoApp.Infrastructure/obj/
+src/DemoApp.Web/obj/
