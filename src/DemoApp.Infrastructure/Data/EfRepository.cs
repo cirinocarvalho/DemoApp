@@ -9,10 +9,9 @@ namespace DemoApp.Infrastructure.Data
 {
     /// <summary>
     /// "There's some repetition here - couldn't we have some the sync methods call the async?"
-    /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class EfRepository<T> : IAsyncRepository<T> where T : BaseEntity<T>
+    public class EfRepository<T> : IAsyncRepository<T> where T : BaseEntity
     {
         protected readonly AutoEmailDbContext _dbContext;
 
@@ -21,7 +20,7 @@ namespace DemoApp.Infrastructure.Data
             _dbContext = dbContext;
         }
 
-        public virtual async Task<T> GetByIdAsync(T id)
+        public virtual async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }

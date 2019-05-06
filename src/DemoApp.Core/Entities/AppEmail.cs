@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DemoApp.Core.Entities
 {
-    public class AppEmail : BaseEntity<int>
+    public class AppEmail : BaseEntity
     {
         public int App_id { get; set; }
         public int AppName { get; set; }

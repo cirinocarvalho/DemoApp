@@ -7,13 +7,27 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Net.Mime;
+using Ardalis.ListStartupServices;
+using DemoApp.Infrastructure.Data;
+using DemoApp.Infrastructure.Services;
+using DemoApp.Infrastructure.Logging;
+using DemoApp.Core.Interfaces;
+using DemoApp.Core.Services;
+using DemoApp.Web.HealthChecks;
 
 namespace DemoApp.Web
 {
     public class Startup
     {
+        private IServiceCollection _services;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -24,6 +38,20 @@ namespace DemoApp.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
+            services.AddScoped<IAppEmailService, AppEmailService>();
+
+            services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
+            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddDbContext<AutoEmailDbContext>(c =>
+                c.UseSqlServer(Configuration.GetConnectionString("DemoConnection")));
+
+            // Add memory cache services
+            services.AddMemoryCache();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -31,16 +59,57 @@ namespace DemoApp.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddHttpContextAccessor();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+            });
+
+            services.AddHealthChecks()
+                .AddCheck<HomePageHealthCheck>("home_page_health_check")
+                .AddCheck<ApiHealthCheck>("api_health_check");
+
+            services.Configure<ServiceConfig>(config =>
+            {
+                config.Services = new List<ServiceDescriptor>(services);
+
+                config.Path = "/allservices";
+            });
+
+            _services = services; // used to debug registered services
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //app.UseDeveloperExceptionPage();
+            app.UseHealthChecks("/health",
+                new HealthCheckOptions
+                {
+                    ResponseWriter = async (context, report) =>
+                    {
+                        var result = JsonConvert.SerializeObject(
+                            new
+                            {
+                                status = report.Status.ToString(),
+                                errors = report.Entries.Select(e => new
+                                {
+                                    key = e.Key,
+                                    value = Enum.GetName(typeof(HealthStatus), e.Value.Status)
+                                })
+                            });
+                        context.Response.ContentType = MediaTypeNames.Application.Json;
+                        await context.Response.WriteAsync(result);
+                    }
+                });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseShowAllServicesMiddleware();
+                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -52,6 +121,17 @@ namespace DemoApp.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
 
             app.UseMvc(routes =>
             {
