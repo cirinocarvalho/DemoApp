@@ -17,9 +17,11 @@ namespace DemoApp.Core.Services
             _logger = logger;
         }
 
-        public async Task GetEmail (int appid)
+        public async Task<IEnumerable<AppEmail>> GetEmailList ()
         {
-            var email = await _appEmailRepository.GetByIdAsync(appid);
+            var listEmail = await _appEmailRepository.ListAllAsync();
+
+            return listEmail;
         }
 
     }

@@ -7,8 +7,8 @@ namespace DemoApp.Core.Entities
     public class AppEmail : BaseEntity
     {
         public int App_id { get; set; }
-        public int AppName { get; set; }
+        public string AppName { get; set; }
         public int? ConnectionID { get; set; }
-        public int ProcedureName { get; set; }
+        public string ProcedureName { get; set; }
     }
 }

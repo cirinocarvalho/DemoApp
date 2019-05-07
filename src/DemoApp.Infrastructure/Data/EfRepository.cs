@@ -20,6 +20,7 @@ namespace DemoApp.Infrastructure.Data
             _dbContext = dbContext;
         }
 
+    #region Async Methods
         public virtual async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
@@ -49,5 +50,11 @@ namespace DemoApp.Infrastructure.Data
             _dbContext.Set<T>().Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
+    #endregion Async Methods
+
+    #region Sync Methods
+
+    
+    #endregion 
     }
 }
