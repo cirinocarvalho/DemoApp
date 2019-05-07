@@ -16,13 +16,24 @@ namespace DemoApp.Web.Api
         }
 
         // GET: api/ToDoItems
-        [HttpGet]
-        public async Task<IActionResult> List()
-        {
+        //[HttpGet]
+        //public async Task<IActionResult> List()
+        //{
            
-            var catalogModel = await _appEmailService.GetEmailList();
+        //    var catalogModel = await _appEmailService.GetEmailList();
             
+        //    return Ok(catalogModel);
+        //}
+
+        // GET: api/ToDoItems
+        [HttpGet]
+        public IActionResult List()
+        {
+
+            var catalogModel = _appEmailService.GetEmailList();
+
             return Ok(catalogModel);
         }
+
     }
 }

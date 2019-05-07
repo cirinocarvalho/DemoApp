@@ -6,6 +6,6 @@ namespace DemoApp.Core.Interfaces
 {
     public interface IAppEmailService
     {
-         Task<IEnumerable<AppEmail>> GetEmailList();
+         IEnumerable<AppEmail> GetEmailList();
     }
 }

@@ -40,7 +40,7 @@ namespace DemoApp.Web
         {
 
 
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IAppEmailService, AppEmailService>();
 
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
