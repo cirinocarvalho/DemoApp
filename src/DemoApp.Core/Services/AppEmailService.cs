@@ -34,12 +34,12 @@ namespace DemoApp.Core.Services
 
         public void Save()
         {
-            _repoWrapper.Save();
+            _repoWrapper.SaveChanges();
         }
 
         public async Task SaveAsync()
         {
-            await _repoWrapper.SaveAsync();
+            await _repoWrapper.SaveChangesAsync();
         }
     }
 }

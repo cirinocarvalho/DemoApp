@@ -79,18 +79,6 @@ namespace DemoApp.Infrastructure.Data
             return await GetQueryable(orderBy: orderBy, includeProperties: includeProperties, skip: skip, take: take).ToListAsync(); ;
         }
 
-        public async Task SaveAsync()
-        {
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-
-            }
-        }
-
         #endregion
 
         #region " Sync Methods "
@@ -136,41 +124,7 @@ namespace DemoApp.Infrastructure.Data
 
         public void DeleteRange(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
 
-        public void Save()
-        {
-            try
-            {
-                _dbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-            }
-        }
-
         #endregion
 
-        #region " Dispose "
-
-        private bool _disposed;
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _dbContext.Dispose();
-                }
-            }
-            _disposed = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
     }
 }

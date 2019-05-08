@@ -6,10 +6,14 @@ using DemoApp.Core.Entities;
 
 namespace DemoApp.Core.Interfaces
 {
-    public interface IRepositoryWrapper
+    public interface IRepositoryWrapper : IDisposable
     {
         IRepository<AppEmail> Owner { get; }
-        void Save();
-        Task SaveAsync();
+        void SaveChanges();
+        Task SaveChangesAsync();
+
+        void BeginTransaction();
+        void CommitTransaction();
+        void RollbackTransaction();
     }
 }

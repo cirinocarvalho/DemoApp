@@ -13,7 +13,6 @@ namespace DemoApp.Core.Interfaces
         Task<TEntity> GetByIdAsync(object id);
         Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null);
         Task<IEnumerable<TEntity>> GetByConditionAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null);
-        Task SaveAsync();
         #endregion
 
         #region " Sync "
@@ -33,8 +32,6 @@ namespace DemoApp.Core.Interfaces
         void Delete(object id);
         void Delete(TEntity entity);
         void DeleteRange(IEnumerable<TEntity> entities);
-
-        void Save();
         #endregion
 
     }

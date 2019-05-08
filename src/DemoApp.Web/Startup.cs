@@ -1,27 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Swashbuckle.AspNetCore.Swagger;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Net.Mime;
 using Ardalis.ListStartupServices;
-using DemoApp.Infrastructure.Data;
-using DemoApp.Infrastructure.Services;
-using DemoApp.Infrastructure.Logging;
-using DemoApp.Core.Interfaces;
-using DemoApp.Core.Services;
 using DemoApp.Web.HealthChecks;
+using DemoApp.Web.Extensions;
 
 namespace DemoApp.Web
 {
@@ -38,18 +31,12 @@ namespace DemoApp.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+          
+            services.ConfigureRepositoryWrapper();
+            services.ConfigureCoreServices();
+            services.ConfigureInfraServices();
 
-
-            //services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddScoped<IAppEmailService, AppEmailService>();
-            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
-
-            services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
-            services.AddTransient<IEmailSender, EmailSender>();
-
-            services.AddDbContext<AutoEmailDbContext>(c =>
-                c.UseSqlServer(Configuration.GetConnectionString("DemoConnection")));
-
+            services.ConfigureSqlServerContext(Configuration);
             // Add memory cache services
             services.AddMemoryCache();
 
