@@ -10,8 +10,12 @@ namespace DemoApp.Infrastructure.Data
     {
         private AutoEmailDbContext _dbContext;
         private IDbContextTransaction _dbTran;
-
         private IRepository<AppEmail> _owner;
+
+        public RepositoryWrapper(AutoEmailDbContext context)
+        {
+            _dbContext = context;
+        }
 
         public IRepository<AppEmail> Owner
         {
@@ -24,11 +28,6 @@ namespace DemoApp.Infrastructure.Data
 
                 return _owner;
             }
-        }
-
-        public RepositoryWrapper(AutoEmailDbContext context)
-        {
-            _dbContext = context;
         }
 
         #region " DB Transaction "
