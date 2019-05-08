@@ -7,28 +7,39 @@ namespace DemoApp.Core.Services
 {
     public class AppEmailService : IAppEmailService
     {
-        private readonly IRepository<AppEmail> _appEmailRepository;
+        //private readonly IRepository<AppEmail> _appEmailRepository;
+        private IRepositoryWrapper _repoWrapper;
         private readonly IAppLogger<AppEmailService> _logger;
 
-        public AppEmailService(IRepository<AppEmail> appEmailRepository,
+        public AppEmailService(IRepositoryWrapper repoWrappery,
            IAppLogger<AppEmailService> logger)
         {
-            _appEmailRepository = appEmailRepository;
+            _repoWrapper = repoWrappery;
             _logger = logger;
         }
 
-        //public async Task<IEnumerable<AppEmail>> GetEmailList ()
-        //{
-        //    var listEmail = await _appEmailRepository.GetAll();
+        public async Task<IEnumerable<AppEmail>> GetEmailLists()
+        {
+            var listEmail = await _repoWrapper.Owner.GetAllAsync();
 
-        //    return listEmail;
-        //}
+            return listEmail;
+        }
 
         public IEnumerable<AppEmail> GetEmailList()
         {
-            var listEmail = _appEmailRepository.GetAll();
+            var listEmail = _repoWrapper.Owner.GetAll();
 
             return listEmail;
+        }
+
+        public void Save()
+        {
+            _repoWrapper.Save();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _repoWrapper.SaveAsync();
         }
     }
 }

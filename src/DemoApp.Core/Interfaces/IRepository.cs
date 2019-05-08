@@ -10,36 +10,17 @@ namespace DemoApp.Core.Interfaces
     public interface IRepository<TEntity> where TEntity : class
     {
         #region " Async "
-        //Task<TEntity> GetByIdAsync(int id);
-        //Task<IReadOnlyList<TEntity>> ListAllAsync();
-        //Task<TEntity> AddAsync(TEntity entity);
-        //Task<TEntity> AddRangeAsync(IEnumerable<TEntity> entities);
-        //Task UpdateAsync(TEntity entity);
-        //Task DeleteAsync(TEntity entity);
-        //Task DeleteRangeAsync(IEnumerable<TEntity> entities);
+        Task<TEntity> GetByIdAsync(object id);
+        Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null);
+        Task<IEnumerable<TEntity>> GetByConditionAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null);
+        Task SaveAsync();
         #endregion
 
         #region " Sync "
-        //Search Records
-        //TEntity Get(int id);
-        //IEnumerable<TEntity> GetAll();
-        //IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> filter = null,
-        //                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-        //                          string includeProperties = null);
-        //TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);
 
-        
         TEntity GetById(object id);
-        IEnumerable<TEntity> GetQueryable(
-            Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = null,
-            int? skip = null,
-            int? take = null);
-
         IEnumerable<TEntity> GetAll(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null);
-        TEntity GetFirst(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null);
-        TEntity GetOne(Expression<Func<TEntity, bool>> filter = null, string includeProperties = null);
+        IEnumerable<TEntity> GetByCondition(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null);
         
         //Add Records
         void Add(TEntity entity);
@@ -49,9 +30,9 @@ namespace DemoApp.Core.Interfaces
         void Update(TEntity entity);
 
         //Remove Records
-        void Remove(object id);
-        void Remove(TEntity entity);
-        void RemoveRange(IEnumerable<TEntity> entities);
+        void Delete(object id);
+        void Delete(TEntity entity);
+        void DeleteRange(IEnumerable<TEntity> entities);
 
         void Save();
         #endregion

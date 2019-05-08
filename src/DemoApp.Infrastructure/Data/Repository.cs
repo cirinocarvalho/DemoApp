@@ -14,7 +14,9 @@ namespace DemoApp.Infrastructure.Data
     /// <typeparam name="TEntity"></typeparam>
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected readonly AutoEmailDbContext _dbContext;
+        //protected readonly AutoEmailDbContext _dbContext;
+        protected AutoEmailDbContext _dbContext { get; set; }
+
         private readonly DbSet<TEntity> _dbSet;
 
         public Repository(AutoEmailDbContext dbContext)
@@ -23,82 +25,7 @@ namespace DemoApp.Infrastructure.Data
             _dbSet = _dbContext.Set<TEntity>();
         }
 
-        //#region " Async Methods "
-        //public virtual async Task<TEntity> GetByIdAsync(int id)
-        //{
-        //    return await _dbContext.Set<TEntity>().FindAsync(id);
-        //}
-
-        //public async Task<IReadOnlyList<TEntity>> ListAllAsync()
-        //{
-        //    return await _dbContext.Set<T>().ToListAsync();
-        //}
-
-        //public async Task<TEntity> AddAsync(TEntity entity)
-        //{
-        //    _dbContext.Set<T>().Add(entity);
-        //    await _dbContext.SaveChangesAsync();
-
-        //    return entity;
-        //}
-
-        //public async Task<TEntity> AddRangeAsync(IEnumerable<TEntity> entities) 
-        //{
-        //    _dbContext.AddRange(entities);
-        //    await _dbContext.SaveChangesAsync();
-
-        //    return entities;
-        //} 
-
-        //public async Task UpdateAsync(TEntity entity)
-        //{
-        //    _dbContext.Attach(entity);
-        //    _dbContext.Entry(entity).State = EntityState.Modified;
-        //    await _dbContext.SaveChangesAsync();
-        //}
-
-        //public async Task DeleteAsync(TEntity entity)
-        //{
-        //    _dbContext.Set<TEntity>().Remove(entity);
-        //    await _dbContext.SaveChangesAsync();
-        //}
-
-        //public async Task DeleteRangeAsync(IEnumerable<TEntity> entities)
-        //{
-        //    _dbContext.RemoveRange(entities);
-        //    await _dbContext.SaveChangesAsync();
-        //}
-
-        //#endregion Async Methods
-
-        #region " Sync Methods "
-        //public TEntity Get(int id) => _dbSet.Find(id);
-
-        //public IEnumerable<TEntity> GetAll() => _dbSet.AsNoTracking().ToList();
-
-        //public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> filter = null,
-        //                                          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-        //                                          string includeProperties = null)
-        //{
-        //    IQueryable<TEntity> query = _dbSet;
-
-        //    if (filter != null)
-        //    {
-        //        query = query.AsNoTracking().Where(filter);
-        //    }
-
-        //    if (includeProperties != null)
-        //    {
-        //        query = includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-        //            .Aggregate(query, (current, includeProperty) => current.AsNoTracking().Include(includeProperty));
-        //    }
-
-        //    return orderBy != null ? orderBy(query).AsNoTracking().ToList() : query.AsNoTracking().ToList();
-        //}
-
-        //public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate) => _dbSet.AsNoTracking().SingleOrDefault(predicate);
-
-        public virtual IEnumerable<TEntity> GetQueryable(
+        protected virtual IQueryable<TEntity> GetQueryable(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = null,
@@ -134,27 +61,51 @@ namespace DemoApp.Infrastructure.Data
                 query = query.Take(take.Value);
             }
 
-            return query.AsEnumerable();
+            return query.AsNoTracking();
         }
 
-        public IEnumerable<TEntity> GetAll(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null)
+        #region " Async Methods "
+        public async Task<TEntity> GetByIdAsync(object id)
         {
-            return GetQueryable(orderBy: orderBy, includeProperties: includeProperties, skip: skip, take: take);
+            return await _dbSet.FindAsync(id);
         }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null)
+        {
+            return await GetQueryable(orderBy: orderBy, includeProperties: includeProperties, skip: skip, take: take).ToListAsync();
+        }
+        public async Task<IEnumerable<TEntity>> GetByConditionAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null)
+        {
+            return await GetQueryable(orderBy: orderBy, includeProperties: includeProperties, skip: skip, take: take).ToListAsync(); ;
+        }
+
+        public async Task SaveAsync()
+        {
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
+        #endregion
+
+        #region " Sync Methods "
 
         public TEntity GetById(object id)
         {
             return _dbSet.Find(id);
         }
-
-        public TEntity GetFirst(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null)
+        public IEnumerable<TEntity> GetAll(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null)
         {
-            return GetQueryable(filter: filter, orderBy: orderBy, includeProperties: includeProperties).FirstOrDefault();
+            return GetQueryable(orderBy: orderBy, includeProperties: includeProperties, skip: skip, take: take);
         }
-
-        public TEntity GetOne(Expression<Func<TEntity, bool>> filter = null, string includeProperties = null)
+        public IEnumerable<TEntity> GetByCondition(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null, int? skip = null, int? take = null)
         {
-            return GetQueryable(filter: filter, includeProperties: includeProperties).SingleOrDefault();
+            return GetQueryable(orderBy: orderBy, includeProperties: includeProperties, skip: skip, take: take);
         }
 
         public void Add(TEntity entity) => _dbSet.Add(entity);
@@ -168,13 +119,13 @@ namespace DemoApp.Infrastructure.Data
         }
 
 
-        public virtual void Remove(object id)
+        public virtual void Delete(object id)
         {
             var entityToDelete = _dbSet.Find(id);
-            Remove(entityToDelete);
+            Delete(entityToDelete);
         }
 
-        public void Remove(TEntity entityToDelete)
+        public void Delete(TEntity entityToDelete)
         {
             if (_dbContext.Entry(entityToDelete).State == EntityState.Detached)
             {
@@ -183,7 +134,7 @@ namespace DemoApp.Infrastructure.Data
             _dbSet.Remove(entityToDelete);
         }
 
-        public void RemoveRange(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
+        public void DeleteRange(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
 
         public void Save()
         {
