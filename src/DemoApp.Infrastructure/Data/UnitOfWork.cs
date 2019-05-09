@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace DemoApp.Infrastructure.Data
 {
-    public class RepositoryWrapper : IRepositoryWrapper
+    public class UnitOfWork : IUnitOfWork
     {
         private AutoEmailDbContext _dbContext;
         private IDbContextTransaction _dbTran;
+
         private IRepository<AppEmail> _owner;
 
-        public RepositoryWrapper(AutoEmailDbContext context)
+        public UnitOfWork(AutoEmailDbContext context)
         {
             _dbContext = context;
         }

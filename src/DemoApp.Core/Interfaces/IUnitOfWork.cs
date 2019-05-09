@@ -6,7 +6,7 @@ using DemoApp.Core.Entities;
 
 namespace DemoApp.Core.Interfaces
 {
-    public interface IRepositoryWrapper : IDisposable
+    public interface IUnitOfWork : IDisposable
     {
         IRepository<AppEmail> Owner { get; }
         void SaveChanges();

@@ -19,7 +19,7 @@ namespace DemoApp.Web.Extensions
 
         public static void ConfigureRepositoryWrapper(this IServiceCollection services)
         {
-            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
         public static void ConfigureCoreServices(this IServiceCollection services)

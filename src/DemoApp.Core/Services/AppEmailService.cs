@@ -8,10 +8,10 @@ namespace DemoApp.Core.Services
     public class AppEmailService : IAppEmailService
     {
         //private readonly IRepository<AppEmail> _appEmailRepository;
-        private IRepositoryWrapper _repoWrapper;
+        private IUnitOfWork _repoWrapper;
         private readonly IAppLogger<AppEmailService> _logger;
 
-        public AppEmailService(IRepositoryWrapper repoWrappery,
+        public AppEmailService(IUnitOfWork repoWrappery,
            IAppLogger<AppEmailService> logger)
         {
             _repoWrapper = repoWrappery;
